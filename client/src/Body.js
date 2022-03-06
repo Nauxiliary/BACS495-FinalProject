@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './Body.css';
 
 export class Body extends Component {
     constructor(props) {
@@ -6,8 +7,8 @@ export class Body extends Component {
         this.state = { apiResponse: "" };
     }
     
-    callAPI() {
-        fetch("http://localhost:9000/testAPI")
+    callAPI(id) {
+        fetch("http://localhost:9000/users/" + id)
             .then(res => res.text())
             .then(res => this.setState({ apiResponse: res }));
     }
@@ -16,9 +17,20 @@ export class Body extends Component {
         this.callAPI();
     }
 
-    render() {
-        return <div>
-            <p className="App-intro">;{this.state.apiResponse}</p>
+    render() { 
+        let welcome
+        if (this.state.apiResponse !== "") {
+            welcome = this.state.apiResponse;
+        } else {
+            welcome = "Please log in."
+        }
+        return <div className='body'>
+            <div>
+                <p onClick={ this.callAPI(1) }>Login</p>
+            </div>
+            <div>
+                {welcome}
+            </div>
         </div>;
     }
 }
