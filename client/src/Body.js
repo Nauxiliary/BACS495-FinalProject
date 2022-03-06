@@ -1,38 +1,30 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import './Body.css';
 
-export class Body extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { apiResponse: "" };
-    }
-    
-    callAPI(id) {
-        fetch("http://localhost:9000/users/" + id)
-            .then(res => res.text())
-            .then(res => this.setState({ apiResponse: res }));
-    }
-    
-    componentWillMount() {
-        this.callAPI();
-    }
+function Body() {
+    const [loginMessage, setLoginMessage] = useState("Not Logged In.");
 
-    render() { 
-        let welcome
-        if (this.state.apiResponse !== "") {
-            welcome = this.state.apiResponse;
-        } else {
-            welcome = "Please log in."
-        }
-        return <div className='body'>
+    const toggleButtonState = (id) => {
+        fetch("http://localhost:9000/users/" + id)
+            .then((response) => response.json())
+            .then((response) => {
+                setLoginMessage(response + " is logged in.");
+            })
+            .catch(() => {
+                setLoginMessage("No User Found.");
+            });
+    };
+
+    return (
+        <div className='body'>
             <div>
-                <p onClick={ this.callAPI(1) }>Login</p>
+                <button onClick={toggleButtonState.bind(this, 1)}> Log In </button>
             </div>
             <div>
-                {welcome}
+                <p> {loginMessage} </p>
             </div>
-        </div>;
-    }
+        </div>);
+
 }
 
 export default Body;
