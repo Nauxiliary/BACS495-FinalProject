@@ -1,24 +1,39 @@
 var express = require('express');
 var router = express.Router();
 
-var users = [
-  {"id":1, "name":"Daniel"},
-  {"id":2, "name":"John"}
-]
-
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.json(users);
+  var db = req.app.locals.db;
+  db.collection("users").get(user);
+
 });
 
 router.get('/:id', function(req, res, next) {
+  var db = req.app.locals.db;
   var id = req.params.id;
-  for(let user of users){
-    if(user.id == id){
-      res.json(user.name);
-    }
+  console.log(id);
+  const query = {'id': id};
+  db.collection("users")
+    .findOne(query)
+    .then(result => {
+      console.log(`Got user ${result}`);
+      res.json(result);
+    })
+    .catch(err=>{
+      console.log(`Error: ${err}`);
+    });
+});
+
+router.post("/", function(req, res, next){
+  const user = {
+    "id": req.body.id,
+    "username": req.body.name,
+    "password": req.body.password
   }
-  res.send("Cannot find user");
-})
+
+  var db = req.app.locals.db;
+  db.collection("users").insertOne(user);
+  res.json({"message":"User inserted"});
+});
 
 module.exports = router;
