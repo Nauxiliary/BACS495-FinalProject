@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Body.css';
+import UserRegistration from './Users/Register';
+import UserDisplay from './Users/UserDisplay';
 
 function Body() {
     const [loginMessage, setLoginMessage] = useState("Not Logged In.");
+    const [users, setUsers] = useState([]);
+    const [update, setUpdate] = useState(0);
 
-    const toggleButtonState = (id) => {
-        fetch("http://localhost:9000/users/" + id)
-            .then((response) => response.json())
-            .then((response) => {
-                setLoginMessage(response + " is logged in.");
-            })
-            .catch(() => {
-                setLoginMessage("No User Found.");
-            });
-    };
+    useEffect(() => {
+        fetch(process.env.REACT_APP_API_URL)
+            .then(res => res.json())
+            .then(data => setUsers(data))
+    }, [update])
+
+    const rerender = () => {
+        var newVal = update + 1;
+        console.log(newVal);
+        setUpdate(newVal);
+    }
 
     return (
         <div className='body'>
             <div>
-                <button onClick={toggleButtonState.bind(this, 1)}> Log In </button>
+                <UserDisplay users={users}/>
+                <UserRegistration notifyParent = {rerender}/>
             </div>
             <div>
                 <p> {loginMessage} </p>

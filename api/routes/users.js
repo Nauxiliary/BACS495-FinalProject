@@ -1,11 +1,12 @@
 var express = require('express');
+const { route } = require('.');
 var router = express.Router();
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   var db = req.app.locals.db;
-  db.collection("users").get(user);
-
+  var cursor = db.collection("users").find();
+  cursor.toArray().then(c => res.json(c));
 });
 
 router.get('/:id', function(req, res, next) {
@@ -24,9 +25,8 @@ router.get('/:id', function(req, res, next) {
     });
 });
 
-router.post("/", function(req, res, next){
+router.post('/', function(req, res, next){
   const user = {
-    "id": req.body.id,
     "username": req.body.name,
     "password": req.body.password
   }
