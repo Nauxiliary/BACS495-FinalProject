@@ -3,37 +3,32 @@ const { route } = require('.');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  var db = req.app.locals.db;
-  var cursor = db.collection("users").find();
-  cursor.toArray().then(c => res.json(c));
+router.get('/', (req, res) => {
+  db.collection("users").find({}).toArray((err, result) => {
+      if(err) throw err
+      res.send(result)
+  })
 });
 
-router.get('/:id', function(req, res, next) {
-  var db = req.app.locals.db;
-  var id = req.params.id;
-  console.log(id);
-  const query = {'id': id};
-  db.collection("users")
-    .findOne(query)
-    .then(result => {
-      console.log(`Got user ${result}`);
-      res.json(result);
-    })
-    .catch(err=>{
-      console.log(`Error: ${err}`);
-    });
+router.get('/:password', (req, res) => {
+  db.collection('users').find({password: parseInt(req.params.password)}).toArray((err, result) => {
+    if(err) throw err
+      res.send(result)
+  })
 });
 
-router.post('/', function(req, res, next){
-  const user = {
-    "username": req.body.name,
-    "password": req.body.password
-  }
-
-  var db = req.app.locals.db;
-  db.collection("users").insertOne(user);
-  res.json({"message":"User inserted"});
+router.post('/', (req, res) =>{
+  let resp = db.collection('users').find({}).sort({password: -1}).limit(1)
+  resp.forEach(obj =>{
+    if(obj){
+      let user ={
+        username: req.body.username,
+        password: obj.password +1
+      }
+      db.collection('users').insertOne(user);
+      res.json({"message":"User inserted"});
+    }
+  })
 });
 
 module.exports = router;
